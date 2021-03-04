@@ -19,9 +19,9 @@ import com.android.grafika.CircularEncoderBuffer;
 import com.koushikdutta.async.ByteBufferList;
 import com.koushikdutta.async.DataEmitter;
 import com.koushikdutta.async.callback.CompletedCallback;
-import com.koushikdutta.async.http.WebSocket;
 import com.koushikdutta.async.callback.DataCallback;
 import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.WebSocket;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,7 +73,7 @@ public class ClientActivity extends Activity implements SurfaceHolder.Callback, 
         deviceWidth = dm.widthPixels;
         deviceHeight = dm.heightPixels;
         address = getIntent().getStringExtra(AddressInputDialog.KEY_ADDRESS_EXTRA);
-        hideSystemUI();
+//        hideSystemUI();
         setContentView(R.layout.activity_client);
         surfaceView = (SurfaceView) findViewById(R.id.main_surface_view);
         surfaceView.getHolder().addCallback(this);
@@ -126,7 +126,7 @@ public class ClientActivity extends Activity implements SurfaceHolder.Callback, 
                 public void onDataAvailable(DataEmitter dataEmitter, ByteBufferList byteBufferList) {
                         ++i;
                         ByteBuffer b = byteBufferList.getAll();
-//                        Log.d(TAG, "Received buffer = " + b);
+                        Log.d(TAG, "Received buffer = " + b);
                         if (i % 2 == 0) {
                             String temp = new String(b.array());
 //                            Log.d(TAG, "Received String = " + temp);

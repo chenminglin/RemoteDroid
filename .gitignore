@@ -4,3 +4,6 @@ local.properties
 .DS_Store
 build/*
 app/build/*
+
+.gradle/*
+.idea/*

@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -17,6 +16,7 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -113,14 +113,14 @@ public class ServerService extends Service {
                 bitrateRatio = Float.parseFloat(preferences.getString(SettingsActivity.KEY_BITRATE_PREF, "1"));
                 updateNotification("Streaming is live at");
                 server.listen(serverPort);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showToast("Starting main touch server");
-                        new MainStarter(ServerService.this).start();
-                        showToast("started main touch server");
-                    }
-                }).start();
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        showToast("Starting main touch server");
+//                        new MainStarter(ServerService.this).start();
+//                        showToast("started main touch server");
+//                    }
+//                }).start();
             } else {
                 final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                         WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
@@ -187,6 +187,7 @@ public class ServerService extends Service {
             webSocket.setDataCallback(new DataCallback() {
                 @Override
                 public void onDataAvailable(DataEmitter dataEmitter, ByteBufferList byteBufferList) {
+                    Log.d(TAG, "webSocket onDataAvailable.");
                     byteBufferList.recycle();
                 }
             });
@@ -196,6 +197,7 @@ public class ServerService extends Service {
     /**
      * Create the display surface out of the encoder. The data to encoder will be fed from this
      * Surface itself.
+     *
      * @return
      * @throws IOException
      */
@@ -247,6 +249,7 @@ public class ServerService extends Service {
 
         @Override
         public void run() {
+            SystemClock.sleep(1000);
             startDisplayManager();
             ByteBuffer[] encoderOutputBuffers = encoder.getOutputBuffers();
 
@@ -261,7 +264,7 @@ public class ServerService extends Service {
                     e.printStackTrace();
                     break;
                 }
-
+                Log.d(TAG, "encoder output encoderStatus  = " + encoderStatus);
                 if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                     // no output available yet
                     //Log.d(TAG, "no output from encoder available");
@@ -341,6 +344,7 @@ public class ServerService extends Service {
 
     /**
      * Display the notification
+     *
      * @param message
      */
     private void updateNotification(String message) {

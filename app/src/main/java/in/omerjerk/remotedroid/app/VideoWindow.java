@@ -22,7 +22,7 @@ import in.umairkhan.remotedroid.R;
  * Created by omerjerk on 13/1/15.
  */
 @SuppressLint("NewApi")
-public class VideoWindow extends LinearLayout implements SurfaceHolder.Callback{
+public class VideoWindow extends LinearLayout implements SurfaceHolder.Callback {
 
     LayoutInflater mInflater;
 
@@ -50,33 +50,37 @@ public class VideoWindow extends LinearLayout implements SurfaceHolder.Callback{
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public VideoWindow (Context context, AttributeSet attrs) {
+    public VideoWindow(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public VideoWindow (Context context, AttributeSet attrs, int defStyle) {
+    public VideoWindow(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     public void inflateSurfaceView() {
         surfaceView = (SurfaceView) findViewById(R.id.demo_surface_view);
         surfaceView.getHolder().addCallback(this);
-        encBuffer = new CircularEncoderBuffer((int)(1024 * 1024 * 0.5), 30, 7);
+        encBuffer = new CircularEncoderBuffer((int) (1024 * 1024 * 0.5), 30, 7);
+
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         try {
+            Log.d(TAG, "VideoWindow surfaceCreated");
             decoder = MediaCodec.createDecoderByType(CodecUtils.MIME_TYPE);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    doDecoderThingie();
-                }
-            }).start();
+            Log.d(TAG, "VideoWindow surfaceCreated decoder = " + decoder);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                doDecoderThingie();
+            }
+        }).start();
+
     }
 
     @Override
@@ -92,12 +96,13 @@ public class VideoWindow extends LinearLayout implements SurfaceHolder.Callback{
     public void doDecoderThingie() {
         boolean outputDone = false;
 
-        while(!decoderConfigured) {
+        while (!decoderConfigured) {
         }
 
         if (MainActivity.DEBUG) Log.d(TAG, "Decoder Configured");
 
-        while(!firstIFrameAdded) {}
+        while (!firstIFrameAdded) {
+        }
 
         int index = encBuffer.getFirstIndex();
         if (index < 0) {
@@ -146,7 +151,7 @@ public class VideoWindow extends LinearLayout implements SurfaceHolder.Callback{
 
     public void setData(ByteBuffer encodedFrames, MediaCodec.BufferInfo info) {
         if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-            Log.d(TAG, "Configuring Decoder");
+            Log.d(TAG, "Configuring Decoder decoder = " + decoder);
             MediaFormat format =
                     MediaFormat.createVideoFormat(CodecUtils.MIME_TYPE, mWidth, mHeight);
             format.setByteBuffer("csd-0", encodedFrames);

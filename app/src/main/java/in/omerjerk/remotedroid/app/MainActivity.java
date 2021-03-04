@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaCodec;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.AsyncTask;
@@ -20,6 +21,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import java.io.IOException;
+
 import eu.chainfire.libsuperuser.Shell;
 import in.umairkhan.remotedroid.R;
 
@@ -54,28 +58,35 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        try {
+            MediaCodec mediaCodec = MediaCodec.createDecoderByType(CodecUtils.MIME_TYPE);
+            Toast.makeText(MainActivity.this, "Device us unrooted! You won't be able to use" +
+                    "this device as a server mediaCodec = "+mediaCodec, Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         hasSystemPrivileges = prefs.getBoolean(KEY_SYSTEM_PRIVILEGE_PREF, false);
         if (savedInstanceState == null) {
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-//                    final boolean isRooted = Shell.SU.available();
-                    final boolean isRooted = true;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isRooted) {
-                                Toast.makeText(MainActivity.this, "Device is rooted", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(MainActivity.this, "Device us unrooted! You won't be able to use" +
-                                        "this device as a server", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                    return null;
-                }
-            }.execute();
+//            new AsyncTask<Void, Void, Void>() {
+//                @Override
+//                protected Void doInBackground(Void... voids) {
+////                    final boolean isRooted = Shell.SU.available();
+//                    final boolean isRooted = true;
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            if (isRooted) {
+//                                Toast.makeText(MainActivity.this, "Device is rooted", Toast.LENGTH_SHORT).show();
+//                            } else {
+//                                Toast.makeText(MainActivity.this, "Device us unrooted! You won't be able to use" +
+//                                        "this device as a server", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                    });
+//                    return null;
+//                }
+//            }.execute();
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mMediaProjectionManager = (MediaProjectionManager)
@@ -193,10 +204,8 @@ public class MainActivity extends Activity {
                             editor.putBoolean(KEY_SYSTEM_PRIVILEGE_PREF, true);
                             editor.commit();
                             Shell.SU.run(String.format(INSTALL_SCRIPT,
-                                    new String[] {
                                             MainActivity.this.getPackageCodePath(),
-                                            MainActivity.this.getPackageName()
-                                    }));
+                                            MainActivity.this.getPackageName()));
                             return null;
                         }
                     }.execute();
